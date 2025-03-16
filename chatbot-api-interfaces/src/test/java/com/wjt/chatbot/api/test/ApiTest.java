@@ -72,4 +72,42 @@ public class ApiTest {
             System.out.println(response.getStatusLine().getStatusCode());
         }
     }
+
+
+    @Test
+    public void test_chatGPT() throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+        /*HttpPost post = new HttpPost("https://api.openai.com/v1/completions");
+        post.addHeader("Content-Type", "application/json");
+        post.addHeader("Authorization", "Bearer 自行申请 https://beta.openai.com/overview");
+
+        String paramJson = "{\"model\": \"text-davinci-003\", \"prompt\": \"帮我写一个java冒泡排序\", \"temperature\": 0, \"max_tokens\": 1024}";
+*/
+
+        // 使用DeepSeek专用接口地址
+        HttpPost post = new HttpPost("https://api.deepseek.com/chat/completions");
+        post.addHeader("Content-Type", "application/json");
+        post.addHeader("Authorization", "Bearer sk-d3460e4521be42b29ba3bd8630ad2d31");
+
+        // 按DeepSeek格式构造请求体
+        String paramJson = "{"
+                + "\"model\": \"deepseek-chat\", " // 或 deepseek-reasoner（需逻辑推理时使用）[3](@ref)
+                + "\"messages\": [{\"role\": \"user\", \"content\": \"帮我写一个java冒泡排序\"}], "
+                + "\"temperature\": 0, "          // 保持确定性输出
+                + "\"max_tokens\": 1024"
+                + "}";
+
+        StringEntity stringEntity = new StringEntity(paramJson, ContentType.create("text/json", "UTF-8"));
+        post.setEntity(stringEntity);
+
+        CloseableHttpResponse response = httpClient.execute(post);
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+            String res = EntityUtils.toString(response.getEntity());
+            System.out.println(res);
+        } else {
+            System.out.println(response.getStatusLine().getStatusCode());
+        }
+
+    }
 }
